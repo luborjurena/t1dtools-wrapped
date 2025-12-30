@@ -27,6 +27,9 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Expose port 80
 EXPOSE 80
 
+# Override entrypoint to directly run nginx, bypassing docker-entrypoint.sh
+ENTRYPOINT ["/usr/sbin/nginx"]
+
 # Start nginx in foreground mode
-CMD ["/usr/sbin/nginx", "-g", "daemon off;"]
+CMD ["-g", "daemon off;"]
 
