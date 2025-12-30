@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  basePath: '/wrapped',
+  basePath: '/t1dtools-wrapped',
   output: 'export'
 }
 
