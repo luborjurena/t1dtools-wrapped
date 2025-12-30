@@ -69,6 +69,10 @@ export const translations = {
     
     // Results
     startOver: 'Start over?',
+    targetRangeUsed: 'Target Range Used',
+    targetRangeDisplay: '{min}-{max} {unit}',
+    mmolL: 'mmol/L',
+    mgdL: 'mg/dL',
     everyDayThisYear: 'Every Day this Year',
     everyDaySubheadline: 'This graph shows the entire year, with each day color coded by the the time in range for that day.',
     

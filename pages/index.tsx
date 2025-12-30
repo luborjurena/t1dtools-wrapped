@@ -20,6 +20,7 @@ export default function Home() {
     const [CGMDataLoading, setCGMDataLoading] = useState<boolean | string>(false)
     const [CGMDataError, setCGMDataError] = useState<string | null>(null)
     const [showCSVGuide, setShowCSVGuide] = useState<boolean>(false)
+    const [activeGlucoseRange, setActiveGlucoseRange] = useState<GlucoseRange | null>(null)
 
     const [nightscoutDomain, setNightscoutDomain] = useState<string>('')
     const [nightscoutSecret, setNightscoutSecret] = useState<string>('')
@@ -47,6 +48,7 @@ export default function Home() {
         setCGMDataError(null)
         setDailyRecords([])
         setCGMDataLoading(false)
+        setActiveGlucoseRange(null)
     }
 
     const handleDroppedFile = async (event: React.DragEvent<HTMLDivElement>) => {
@@ -114,6 +116,7 @@ export default function Home() {
         const mappedDailyRecords = mapGlucoseRecordsToDailyRecords(records, glucoseRange)
 
         setDailyRecords(mappedDailyRecords)
+        setActiveGlucoseRange(glucoseRange)
         setCGMDataLoading(false)
         clearInterval(loadingInterval)
     }
@@ -181,6 +184,7 @@ export default function Home() {
         const mappedDailyRecords = mapGlucoseRecordsToDailyRecords(records, glucoseRange)
 
         setDailyRecords(mappedDailyRecords)
+        setActiveGlucoseRange(glucoseRange)
         setCGMDataLoading(false)
         clearInterval(loadingInterval)
     }
@@ -564,6 +568,18 @@ export default function Home() {
 
                 {!CGMDataLoading && dailyRecords.length > 0 && (
                     <div className="max-w-[1600px] flex flex-col items-center justify-center self-center">
+                        {activeGlucoseRange && (
+                            <div className="mb-4 w-full rounded-xl bg-gray-800 p-4 text-center">
+                                <span className="text-sm text-gray-400">{t('targetRangeUsed')}: </span>
+                                <span className="text-lg font-semibold text-white">
+                                    {t('targetRangeDisplay', {
+                                        min: activeGlucoseRange.min,
+                                        max: activeGlucoseRange.max,
+                                        unit: activeGlucoseRange.unit === 'mmol' ? t('mmolL') : t('mgdL')
+                                    })}
+                                </span>
+                            </div>
+                        )}
                         <div className="mb-8 w-full rounded-xl bg-gray-800 p-10 pt-0">
                             <DayGraph dailyRecords={dailyRecords} />
                         </div>

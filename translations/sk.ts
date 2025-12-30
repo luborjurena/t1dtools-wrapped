@@ -69,6 +69,10 @@ export const translations = {
     
     // Results
     startOver: 'Začať znova?',
+    targetRangeUsed: 'Použitý cieľový rozsah',
+    targetRangeDisplay: '{min}-{max} {unit}',
+    mmolL: 'mmol/L',
+    mgdL: 'mg/dL',
     everyDayThisYear: 'Každý deň tohto roka',
     everyDaySubheadline: 'Tento graf zobrazuje celý rok, pričom každý deň je farebne označený podľa času v rozsahu pre daný deň.',
     
