@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  wrapped:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    container_name: diabetes-wrapped
+    restart: unless-stopped
+

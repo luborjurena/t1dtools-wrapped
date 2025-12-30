@@ -7,7 +7,9 @@ export enum GlucoseTypes {
 
 export type Options = {
     glucoseType: GlucoseTypes
-    year: number,
+    year?: number,
+    startDate?: Date,
+    endDate?: Date,
 }
 
 export type ParseResponse = {

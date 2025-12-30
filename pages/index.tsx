@@ -4,7 +4,7 @@ import { DayGraph } from '../components/dayGraph'
 import { RangeDoughnuts } from '../components/rangeDoughnuts'
 import { RangeByDays } from '../components/rangeByDays'
 import { Headline } from '../components/headline'
-import { mapGlucoseRecordsToDailyRecords, DailyRecord } from '../datahandling/dailyRecords'
+import { mapGlucoseRecordsToDailyRecords, DailyRecord, GlucoseRange } from '../datahandling/dailyRecords'
 import { parseLibreViewData } from '../parsing/libreview'
 import { parseDexcomClarityData } from '../parsing/dexcomclarity'
 import { fetchAndParseNightscoutData } from '../parsing/nightscout'
@@ -21,6 +21,22 @@ export default function Home() {
 
     const [nightscoutDomain, setNightscoutDomain] = useState<string>('')
     const [nightscoutSecret, setNightscoutSecret] = useState<string>('')
+    
+    // Date range for Nightscout - default to current year
+    const currentYear = new Date().getFullYear()
+    const [startDate, setStartDate] = useState<string>(() => {
+        const date = new Date(currentYear, 0, 1)
+        return date.toISOString().split('T')[0]
+    })
+    const [endDate, setEndDate] = useState<string>(() => {
+        const date = new Date(currentYear, 11, 31)
+        return date.toISOString().split('T')[0]
+    })
+
+    // Glucose range - default to 3.9-10 mmol/L (70-180 mg/dL)
+    const [glucoseRangeUnit, setGlucoseRangeUnit] = useState<'mmol' | 'mgdl'>('mmol')
+    const [glucoseRangeMin, setGlucoseRangeMin] = useState<string>('3.9')
+    const [glucoseRangeMax, setGlucoseRangeMax] = useState<string>('10.0')
 
     const [dragActive, setDragActive] = useState<boolean>(false)
 
@@ -50,7 +66,24 @@ export default function Home() {
             domain = domain.slice(0, -1)
         }
 
-        const response = await fetchAndParseNightscoutData(domain, nightscoutSecret, 2022)
+        const start = new Date(startDate)
+        const end = new Date(endDate)
+        
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+            clearInterval(loadingInterval)
+            setCGMDataError('Invalid date range. Please select valid start and end dates.')
+            setCGMDataLoading(false)
+            return
+        }
+        
+        if (start > end) {
+            clearInterval(loadingInterval)
+            setCGMDataError('Start date must be before end date.')
+            setCGMDataLoading(false)
+            return
+        }
+
+        const response = await fetchAndParseNightscoutData(domain, nightscoutSecret, start, end)
 
         if (response.error) {
             clearInterval(loadingInterval)
@@ -61,7 +94,22 @@ export default function Home() {
 
         const records = response.records
 
-        const mappedDailyRecords = mapGlucoseRecordsToDailyRecords(records)
+        const min = parseFloat(glucoseRangeMin)
+        const max = parseFloat(glucoseRangeMax)
+        
+        if (isNaN(min) || isNaN(max) || min >= max) {
+            clearInterval(loadingInterval)
+            setCGMDataError('Invalid glucose range. Minimum must be less than maximum.')
+            setCGMDataLoading(false)
+            return
+        }
+
+        const glucoseRange: GlucoseRange = {
+            min,
+            max,
+            unit: glucoseRangeUnit,
+        }
+        const mappedDailyRecords = mapGlucoseRecordsToDailyRecords(records, glucoseRange)
 
         setDailyRecords(mappedDailyRecords)
         setCGMDataLoading(false)
@@ -99,7 +147,9 @@ export default function Home() {
                 response = await parseDexcomClarityData(file, 2022)
             }
         } else if (cgmProvider === 'nightscout') {
-            response = await fetchAndParseNightscoutData(nightscoutDomain, nightscoutSecret, 2022)
+            const start = new Date(startDate)
+            const end = new Date(endDate)
+            response = await fetchAndParseNightscoutData(nightscoutDomain, nightscoutSecret, start, end)
         }
 
         if (response.error) {
@@ -111,7 +161,22 @@ export default function Home() {
 
         const records = response.records
 
-        const mappedDailyRecords = mapGlucoseRecordsToDailyRecords(records)
+        const min = parseFloat(glucoseRangeMin)
+        const max = parseFloat(glucoseRangeMax)
+        
+        if (isNaN(min) || isNaN(max) || min >= max) {
+            clearInterval(loadingInterval)
+            setCGMDataError('Invalid glucose range. Minimum must be less than maximum.')
+            setCGMDataLoading(false)
+            return
+        }
+
+        const glucoseRange: GlucoseRange = {
+            min,
+            max,
+            unit: glucoseRangeUnit,
+        }
+        const mappedDailyRecords = mapGlucoseRecordsToDailyRecords(records, glucoseRange)
 
         setDailyRecords(mappedDailyRecords)
         setCGMDataLoading(false)
@@ -138,9 +203,6 @@ export default function Home() {
     const showDemo = () => {
         const demoData: DailyRecord[] = []
         for (let i = 1; i < 366; i++) {
-            if (i % 100 === 0) {
-                console.log(new Date(2022, 0, i))
-            }
             demoData.push({
                 date: new Date(2022, 0, i),
                 rangePercentage: Math.round(Math.random() * 100),
@@ -167,17 +229,17 @@ export default function Home() {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-            <Headline size={1} text="t1d.tools/wrapped" />
+            <Headline size={1} text="glykemia.sk" />
             <div className="flex flex-col items-center justify-center self-center">
                 {dailyRecords.length === 0 && (
                     <div className="z-10 w-full rounded-xl bg-gray-800 p-10 sm:max-w-lg">
                         <div className="text-center">
                             <h2 className="mt-5 text-3xl font-bold text-gray-200">Visualize your CGM data!</h2>
                             <p className="mt-2 text-sm text-gray-400">
-                                t1d.tools wrapped runs entirely in your browser, sending no data to any servers. Find
+                                glykemia.sk wrapped tool runs entirely in your browser, sending no data to any servers. Find
                                 the project on{' '}
                                 <a
-                                    href="https://github.com/t1dtools/wrapped"
+                                    href="https://github.com/luborjurena/t1dtools-wrapped"
                                     className="text-blue-500 hover:text-blue-700"
                                     target="_blank">
                                     GitHub
@@ -211,6 +273,68 @@ export default function Home() {
                                         <option value="nightscout">Nightscout</option>
                                     </select>
                                 </div>
+                                {cgmProvider !== undefined && (
+                                    <div className="grid grid-cols-1 space-y-2 rounded-lg bg-gray-700 p-4">
+                                        <label className="text-sm font-bold tracking-wide text-gray-500">
+                                            Target Glucose Range
+                                        </label>
+                                        <div className="grid grid-cols-3 gap-2">
+                                            <div className="grid grid-cols-1 space-y-1">
+                                                <label htmlFor="rangeUnit" className="text-xs text-gray-400">
+                                                    Unit
+                                                </label>
+                                                <select
+                                                    id="rangeUnit"
+                                                    value={glucoseRangeUnit}
+                                                    onChange={e => {
+                                                        const unit = e.target.value as 'mmol' | 'mgdl'
+                                                        setGlucoseRangeUnit(unit)
+                                                        // Update default values when switching units
+                                                        if (unit === 'mmol') {
+                                                            setGlucoseRangeMin('3.9')
+                                                            setGlucoseRangeMax('10.0')
+                                                        } else {
+                                                            setGlucoseRangeMin('70')
+                                                            setGlucoseRangeMax('180')
+                                                        }
+                                                    }}
+                                                    className="block w-full rounded-lg border border-gray-600 bg-gray-800 p-2 text-xs text-white focus:border-blue-500 focus:outline-none">
+                                                    <option value="mmol">mmol/L</option>
+                                                    <option value="mgdl">mg/dL</option>
+                                                </select>
+                                            </div>
+                                            <div className="grid grid-cols-1 space-y-1">
+                                                <label htmlFor="rangeMin" className="text-xs text-gray-400">
+                                                    Min {glucoseRangeUnit === 'mmol' ? '(mmol/L)' : '(mg/dL)'}
+                                                </label>
+                                                <input
+                                                    id="rangeMin"
+                                                    type="number"
+                                                    step={glucoseRangeUnit === 'mmol' ? '0.1' : '1'}
+                                                    value={glucoseRangeMin}
+                                                    onChange={e => setGlucoseRangeMin(e.target.value)}
+                                                    className="block w-full rounded-lg border border-gray-600 bg-gray-800 p-2 text-xs text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+                                                />
+                                            </div>
+                                            <div className="grid grid-cols-1 space-y-1">
+                                                <label htmlFor="rangeMax" className="text-xs text-gray-400">
+                                                    Max {glucoseRangeUnit === 'mmol' ? '(mmol/L)' : '(mg/dL)'}
+                                                </label>
+                                                <input
+                                                    id="rangeMax"
+                                                    type="number"
+                                                    step={glucoseRangeUnit === 'mmol' ? '0.1' : '1'}
+                                                    value={glucoseRangeMax}
+                                                    onChange={e => setGlucoseRangeMax(e.target.value)}
+                                                    className="block w-full rounded-lg border border-gray-600 bg-gray-800 p-2 text-xs text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+                                                />
+                                            </div>
+                                        </div>
+                                        <p className="text-xs text-gray-400">
+                                            Default: 3.9-10.0 mmol/L (70-180 mg/dL). Adjust to match your target range.
+                                        </p>
+                                    </div>
+                                )}
                                 {(cgmProvider === 'libreview' || cgmProvider === 'dexcom') && (
                                     <div className="grid grid-cols-1 space-y-2">
                                         <label className="text-sm font-bold tracking-wide text-gray-500">
@@ -252,7 +376,7 @@ export default function Home() {
                                                         can help, please open an issue on{' '}
                                                         <a
                                                             className="text-blue-500 hover:text-blue-700"
-                                                            href="https://github.com/t1dtools/wrapped">
+                                                            href="https://github.com/luborjurena/t1dtools-wrapped">
                                                             GitHub
                                                         </a>
                                                         .
@@ -361,11 +485,38 @@ export default function Home() {
                                             />
                                         </div>
                                         <div className="grid grid-cols-1 space-y-2">
+                                            <label
+                                                htmlFor="startDate"
+                                                className="text-sm font-bold tracking-wide text-gray-500">
+                                                Start Date
+                                            </label>
+                                            <input
+                                                id="startDate"
+                                                type="date"
+                                                value={startDate}
+                                                className="block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+                                                onChange={e => setStartDate(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-1 space-y-2">
+                                            <label
+                                                htmlFor="endDate"
+                                                className="text-sm font-bold tracking-wide text-gray-500">
+                                                End Date
+                                            </label>
+                                            <input
+                                                id="endDate"
+                                                type="date"
+                                                value={endDate}
+                                                className="block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+                                                onChange={e => setEndDate(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-1 space-y-2">
                                             <button
-                                                id="nskey"
                                                 className="mt-8 rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:text-gray-500 disabled:opacity-50"
                                                 onClick={() => getNightscoutData()}
-                                                disabled={nightscoutDomain === '' || nightscoutSecret === ''}>
+                                                disabled={nightscoutDomain === '' || nightscoutSecret === '' || !startDate || !endDate}>
                                                 Wrap it!
                                             </button>
                                         </div>
@@ -430,10 +581,10 @@ export default function Home() {
                 )}
             </div>
             <div className="mt-8 mb-8 text-center text-sm text-gray-600">
-                t1d.tools is a collection of Type 1 Diabetes related tools. They're all open source and can be found on{' '}
-                <a href="https://github.com/t1dtools" className="underline hover:no-underline">
+                This tool is open source and can be found on{' '}
+                <a href="https://github.com/luborjurena/t1dtools-wrapped" className="underline hover:no-underline">
                     GitHub
-                </a>
+                </a>, originally developed by t1d.tools team
                 .
             </div>
         </>
