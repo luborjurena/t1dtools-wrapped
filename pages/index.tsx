@@ -11,8 +11,10 @@ import { fetchAndParseNightscoutData } from '../parsing/nightscout'
 import classnames from 'classnames'
 import { ParseResponse } from '../parsing/glucose'
 import { getLoadingMessage } from '../datahandling/loading'
+import { useTranslation } from '../contexts/TranslationContext'
 
 export default function Home() {
+    const { t } = useTranslation()
     const [cgmProvider, setCGMProvider] = useState<'dexcom' | 'libreview' | 'nightscout' | undefined>(undefined)
     const [dailyRecords, setDailyRecords] = useState<DailyRecord[]>([])
     const [CGMDataLoading, setCGMDataLoading] = useState<boolean | string>(false)
@@ -71,14 +73,14 @@ export default function Home() {
         
         if (isNaN(start.getTime()) || isNaN(end.getTime())) {
             clearInterval(loadingInterval)
-            setCGMDataError('Invalid date range. Please select valid start and end dates.')
+            setCGMDataError(t('invalidDateRange'))
             setCGMDataLoading(false)
             return
         }
         
         if (start > end) {
             clearInterval(loadingInterval)
-            setCGMDataError('Start date must be before end date.')
+            setCGMDataError(t('startBeforeEnd'))
             setCGMDataLoading(false)
             return
         }
@@ -130,7 +132,7 @@ export default function Home() {
 
         let response: ParseResponse = {
             records: [],
-            error: { message: 'No cgm provider selected.' },
+            error: { message: t('noCGMProvider') },
         }
 
         if (['libreview', 'dexcom'].includes(cgmProvider)) {
@@ -166,7 +168,7 @@ export default function Home() {
         
         if (isNaN(min) || isNaN(max) || min >= max) {
             clearInterval(loadingInterval)
-            setCGMDataError('Invalid glucose range. Minimum must be less than maximum.')
+            setCGMDataError(t('invalidGlucoseRange'))
             setCGMDataLoading(false)
             return
         }
@@ -220,24 +222,23 @@ export default function Home() {
     return (
         <>
             <Head>
-                <title>Diabetes Wrapped</title>
+                <title>{t('metaTitle')}</title>
                 <meta
                     name="description"
-                    content="A Spotify Wrapped style view of your year with diabetes, based on your CGM data"
+                    content={t('metaDescription')}
                 />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-            <Headline size={1} text="glykemia.sk" />
+            <Headline size={1} text={t('headline')} />
             <div className="flex flex-col items-center justify-center self-center">
                 {dailyRecords.length === 0 && (
                     <div className="z-10 w-full rounded-xl bg-gray-800 p-10 sm:max-w-lg">
                         <div className="text-center">
-                            <h2 className="mt-5 text-3xl font-bold text-gray-200">Visualize your CGM data!</h2>
+                            <h2 className="mt-5 text-3xl font-bold text-gray-200">{t('visualizeTitle')}</h2>
                             <p className="mt-2 text-sm text-gray-400">
-                                glykemia.sk wrapped tool runs entirely in your browser, sending no data to any servers. Find
-                                the project on{' '}
+                                {t('description')}{' '}
                                 <a
                                     href="https://github.com/luborjurena/t1dtools-wrapped"
                                     className="text-blue-500 hover:text-blue-700"
@@ -247,9 +248,9 @@ export default function Home() {
                                 .
                             </p>
                             <p className="mt-2 text-sm text-gray-400">
-                                Curious what this is?{' '}
+                                {t('curious')}{' '}
                                 <button onClick={e => showDemo()} className="text-blue-500 hover:text-blue-700">
-                                    Have a look at this demo
+                                    {t('demoLink')}
                                 </button>
                                 .
                             </p>
@@ -260,28 +261,28 @@ export default function Home() {
                                     <label
                                         htmlFor="cgmproviders"
                                         className="text-sm font-bold tracking-wide text-gray-500">
-                                        Select CGM Provider
+                                        {t('selectCGMProvider')}
                                     </label>
                                     <select
                                         value={cgmProvider}
                                         onChange={e => setCGMProvider(e.target.value as any)}
                                         id="cgmproviders"
                                         className="block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none">
-                                        <option value="choose">Choose a CGM data provider</option>
-                                        <option value="dexcom">Dexcom Clarity</option>
-                                        <option value="libreview">Libreview (Freestyle Libre)</option>
-                                        <option value="nightscout">Nightscout</option>
+                                        <option value="choose">{t('chooseCGMProvider')}</option>
+                                        <option value="dexcom">{t('dexcom')}</option>
+                                        <option value="libreview">{t('libreview')}</option>
+                                        <option value="nightscout">{t('nightscout')}</option>
                                     </select>
                                 </div>
                                 {cgmProvider !== undefined && (
                                     <div className="grid grid-cols-1 space-y-2 rounded-lg bg-gray-700 p-4">
                                         <label className="text-sm font-bold tracking-wide text-gray-500">
-                                            Target Glucose Range
+                                            {t('targetGlucoseRange')}
                                         </label>
                                         <div className="grid grid-cols-3 gap-2">
                                             <div className="grid grid-cols-1 space-y-1">
                                                 <label htmlFor="rangeUnit" className="text-xs text-gray-400">
-                                                    Unit
+                                                    {t('unit')}
                                                 </label>
                                                 <select
                                                     id="rangeUnit"
@@ -305,7 +306,7 @@ export default function Home() {
                                             </div>
                                             <div className="grid grid-cols-1 space-y-1">
                                                 <label htmlFor="rangeMin" className="text-xs text-gray-400">
-                                                    Min {glucoseRangeUnit === 'mmol' ? '(mmol/L)' : '(mg/dL)'}
+                                                    {t('min')} {glucoseRangeUnit === 'mmol' ? '(mmol/L)' : '(mg/dL)'}
                                                 </label>
                                                 <input
                                                     id="rangeMin"
@@ -318,7 +319,7 @@ export default function Home() {
                                             </div>
                                             <div className="grid grid-cols-1 space-y-1">
                                                 <label htmlFor="rangeMax" className="text-xs text-gray-400">
-                                                    Max {glucoseRangeUnit === 'mmol' ? '(mmol/L)' : '(mg/dL)'}
+                                                    {t('max')} {glucoseRangeUnit === 'mmol' ? '(mmol/L)' : '(mg/dL)'}
                                                 </label>
                                                 <input
                                                     id="rangeMax"
@@ -331,26 +332,26 @@ export default function Home() {
                                             </div>
                                         </div>
                                         <p className="text-xs text-gray-400">
-                                            Default: 3.9-10.0 mmol/L (70-180 mg/dL). Adjust to match your target range.
+                                            {t('defaultRange')}
                                         </p>
                                     </div>
                                 )}
                                 {(cgmProvider === 'libreview' || cgmProvider === 'dexcom') && (
                                     <div className="grid grid-cols-1 space-y-2">
                                         <label className="text-sm font-bold tracking-wide text-gray-500">
-                                            Select your CSV file{' '}
+                                            {t('selectCSVFile')}{' '}
                                             <span className="text-sm font-thin text-gray-400">
-                                                (<button onClick={e => toggleCSVGuide(e)}>How?</button>)
+                                                (<button onClick={e => toggleCSVGuide(e)}>{t('how')}</button>)
                                             </span>
                                         </label>
                                         {showCSVGuide && (
                                             <div className="rounded-lg bg-gray-700 p-4">
                                                 {cgmProvider === 'libreview' && (
                                                     <>
-                                                        <p className="font-bold">Analyze your LibreView data</p>
+                                                        <p className="font-bold">{t('analyzeLibreView')}</p>
                                                         <ul className="list-disc p-2">
                                                             <li>
-                                                                Log in to your account on{' '}
+                                                                {t('libreViewStep1')}{' '}
                                                                 <a
                                                                     href="https://www.libreview.com/"
                                                                     target="_blank"
@@ -359,21 +360,17 @@ export default function Home() {
                                                                 </a>
                                                             </li>
                                                             <li>
-                                                                Click the blue "Download glucose data" button in the top
-                                                                right corner, and save the generated file to your
-                                                                computer.
+                                                                {t('libreViewStep2')}
                                                             </li>
                                                             <li>
-                                                                Drag and drop the file into the box below, or click the
-                                                                box to select the file.
+                                                                {t('libreViewStep3')}
                                                             </li>
                                                         </ul>
                                                     </>
                                                 )}
                                                 {cgmProvider === 'dexcom' && (
                                                     <>
-                                                        Currently instructions are missing for Dexcom Clarity. If you
-                                                        can help, please open an issue on{' '}
+                                                        {t('dexcomMissing')}{' '}
                                                         <a
                                                             className="text-blue-500 hover:text-blue-700"
                                                             href="https://github.com/luborjurena/t1dtools-wrapped">
@@ -396,17 +393,17 @@ export default function Home() {
                                                 onDrop={handleDroppedFile}>
                                                 <div className="flex h-full w-full flex-col items-center justify-center text-center">
                                                     {dragActive && (
-                                                        <p className="pointer-none text-gray-500 ">Drop it!</p>
+                                                        <p className="pointer-none text-gray-500 ">{t('dropIt')}</p>
                                                     )}
                                                     {!dragActive && (
                                                         <p className="pointer-none text-gray-500 ">
                                                             <span className="text-sm">
-                                                                Drag and drop your CGM export here <br />
-                                                                or{' '}
+                                                                {t('dragDropText')} <br />
+                                                                alebo{' '}
                                                                 <span className="text-blue-500 hover:text-blue-700">
-                                                                    click to select
+                                                                    {t('clickToSelect')}
                                                                 </span>{' '}
-                                                                a file from your computer.
+                                                                {t('fileFromComputer')}
                                                             </span>
                                                         </p>
                                                     )}
@@ -426,31 +423,31 @@ export default function Home() {
                                     <>
                                         <div className="grid grid-cols-1 space-y-2 text-gray-500">
                                             <span className="text-sm font-bold tracking-wide text-gray-500">
-                                                Nightscout Requirements
+                                                {t('nightscoutRequirements')}
                                             </span>
                                             <ul className="list-decimal rounded-xl bg-gray-700 p-4 pl-8 text-sm text-gray-400">
                                                 <li>
-                                                    API Secret with at least a{' '}
+                                                    {t('nightscoutReq1')}{' '}
                                                     <span className="rounded bg-slate-900 p-1 font-mono text-sm font-bold">
-                                                        readable
+                                                        {t('readable')}
                                                     </span>{' '}
-                                                    role.
+                                                    {t('role')}
                                                 </li>
                                                 <li>
-                                                    Ensure that your Nightscout instance has{' '}
+                                                    {t('nightscoutReq2')}{' '}
                                                     <span className="rounded bg-slate-900 p-1 font-mono text-sm font-bold">
-                                                        cors
+                                                        {t('cors')}
                                                     </span>{' '}
-                                                    in it's{' '}
+                                                    {t('inVariable')}{' '}
                                                     <a
                                                         href="https://nightscout.github.io/nightscout/setup_variables/#cors-cors"
                                                         target="_blank"
                                                         className="text-blue-500 hover:text-blue-700">
                                                         <span className="rounded bg-slate-900 p-1 font-mono text-sm font-bold">
-                                                            VARIABLE
+                                                            {t('variable')}
                                                         </span>
                                                     </a>{' '}
-                                                    configuration.
+                                                    {t('configuration')}
                                                 </li>
                                             </ul>
                                         </div>
@@ -458,7 +455,7 @@ export default function Home() {
                                             <label
                                                 htmlFor="nsdomain"
                                                 className="text-sm font-bold tracking-wide text-gray-500">
-                                                Nightscout Server
+                                                {t('nightscoutServer')}
                                             </label>
 
                                             <input
@@ -473,7 +470,7 @@ export default function Home() {
                                             <label
                                                 htmlFor="nskey"
                                                 className="text-sm font-bold tracking-wide text-gray-500">
-                                                API Secret
+                                                {t('apiSecret')}
                                             </label>
 
                                             <input
@@ -488,7 +485,7 @@ export default function Home() {
                                             <label
                                                 htmlFor="startDate"
                                                 className="text-sm font-bold tracking-wide text-gray-500">
-                                                Start Date
+                                                {t('startDate')}
                                             </label>
                                             <input
                                                 id="startDate"
@@ -502,7 +499,7 @@ export default function Home() {
                                             <label
                                                 htmlFor="endDate"
                                                 className="text-sm font-bold tracking-wide text-gray-500">
-                                                End Date
+                                                {t('endDate')}
                                             </label>
                                             <input
                                                 id="endDate"
@@ -517,7 +514,7 @@ export default function Home() {
                                                 className="mt-8 rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:text-gray-500 disabled:opacity-50"
                                                 onClick={() => getNightscoutData()}
                                                 disabled={nightscoutDomain === '' || nightscoutSecret === '' || !startDate || !endDate}>
-                                                Wrap it!
+                                                {t('wrapIt')}
                                             </button>
                                         </div>
                                     </>
@@ -527,7 +524,7 @@ export default function Home() {
 
                         {CGMDataLoading && (
                             <div className="pt-8 text-center">
-                                Generating your wrapped report...
+                                {t('generatingReport')}
                                 {typeof CGMDataLoading === 'string' && (
                                     <span className="mt-2 block">{CGMDataLoading}</span>
                                 )}
@@ -552,7 +549,7 @@ export default function Home() {
                         )}
                         {!CGMDataLoading && CGMDataError && (
                             <div className="pt-8 text-center text-red-500">
-                                There was an error parsing your CGM data: {CGMDataError}
+                                {t('errorParsing')} {CGMDataError}
                             </div>
                         )}
                     </div>
@@ -560,7 +557,7 @@ export default function Home() {
                 {dailyRecords.length > 0 && !CGMDataLoading && (
                     <div className="pointer-cursor absolute top-5 right-5 rounded-md bg-gray-800 p-2 hover:text-gray-400">
                         <a href="#" onClick={reset} className="pointer-cursor text-sm">
-                            Start over?
+                            {t('startOver')}
                         </a>
                     </div>
                 )}
@@ -581,10 +578,10 @@ export default function Home() {
                 )}
             </div>
             <div className="mt-8 mb-8 text-center text-sm text-gray-600">
-                This tool is open source and can be found on{' '}
+                {t('openSource')}{' '}
                 <a href="https://github.com/luborjurena/t1dtools-wrapped" className="underline hover:no-underline">
                     GitHub
-                </a>, originally developed by t1d.tools team
+                </a>, {t('originallyBy')}
                 .
             </div>
         </>

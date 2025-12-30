@@ -2,8 +2,10 @@ import React from 'react'
 import { Doughnut } from './doughnut'
 import { DailyRecord } from '../datahandling/dailyRecords'
 import { Headline } from './headline'
+import { useTranslation } from '../contexts/TranslationContext'
 
 export const RangeDoughnuts = ({ dailyRecords }: { dailyRecords: DailyRecord[] }) => {
+    const { t } = useTranslation()
     const daysOverPercentage = {
         d0: 0,
         d10: 0,
@@ -61,17 +63,17 @@ export const RangeDoughnuts = ({ dailyRecords }: { dailyRecords: DailyRecord[] }
         <>
             <Headline
                 size={2}
-                text="Range Distribution"
-                subheadline="How many days to you have over a certain percentage in range?"
+                text={t('rangeDistribution')}
+                subheadline={t('rangeDistributionSubheadline')}
             />
             <div
                 className="doughnuts w-[1500px]"
                 style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 30 }}>
-                <Doughnut count={daysOverPercentage.d60} headline="Days over 60%" total={total} color="hsl(61, 100%, 36%)" />
-                <Doughnut count={daysOverPercentage.d70} headline="Days over 70%" total={total} color="hsl(67, 100%, 44%)" />
-                <Doughnut count={daysOverPercentage.d80} headline="Days over 80%" total={total} color="hsl(144, 100%, 31%)" />
-                <Doughnut count={daysOverPercentage.d90} headline="Days over 90%" total={total} color="hsl(144, 100%, 39%)" />
-                <Doughnut count={daysOverPercentage.d100} headline="Days at 100%" total={total} color="hsl(144, 100%, 50%)" />
+                <Doughnut count={daysOverPercentage.d60} headline={`${t('daysOver')} 60%`} total={total} color="hsl(61, 100%, 36%)" />
+                <Doughnut count={daysOverPercentage.d70} headline={`${t('daysOver')} 70%`} total={total} color="hsl(67, 100%, 44%)" />
+                <Doughnut count={daysOverPercentage.d80} headline={`${t('daysOver')} 80%`} total={total} color="hsl(144, 100%, 31%)" />
+                <Doughnut count={daysOverPercentage.d90} headline={`${t('daysOver')} 90%`} total={total} color="hsl(144, 100%, 39%)" />
+                <Doughnut count={daysOverPercentage.d100} headline={`${t('daysAt')} 100%`} total={total} color="hsl(144, 100%, 50%)" />
             </div>
         </>
     )

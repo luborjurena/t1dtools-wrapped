@@ -2,6 +2,7 @@ import React from 'react'
 import { format } from 'date-fns'
 import { DailyRecord } from '../datahandling/dailyRecords'
 import { Headline } from './headline'
+import { useTranslation } from '../contexts/TranslationContext'
 
 type Day = {
     date: Date
@@ -14,6 +15,7 @@ type Props = {
 }
 
 export const DayGraph = (props: Props) => {
+    const { t } = useTranslation()
     const year = props.dailyRecords[0].date.getFullYear()
     const preYearDays: Day[] = []
     const firstDayOfYear = new Date(year, 0, 1)
@@ -57,33 +59,33 @@ export const DayGraph = (props: Props) => {
         <>
             <Headline
                 size={2}
-                text="Every Day this Year"
-                subheadline="This graph shows the entire year, with each day color coded by the the time in range for that day."
+                text={t('everyDayThisYear')}
+                subheadline={t('everyDaySubheadline')}
             />
             <div style={{ textAlign: 'center' }}>
                 <div className="graph">
                     <ul className="months pl-3 text-left">
-                        <li>Jan</li>
-                        <li>Feb</li>
-                        <li>Mar</li>
-                        <li>Apr</li>
-                        <li>May</li>
-                        <li>Jun</li>
-                        <li>Jul</li>
-                        <li>Aug</li>
-                        <li>Sep</li>
-                        <li>Oct</li>
-                        <li>Nov</li>
-                        <li>Dec</li>
+                        <li>{t('jan')}</li>
+                        <li>{t('feb')}</li>
+                        <li>{t('mar')}</li>
+                        <li>{t('apr')}</li>
+                        <li>{t('may')}</li>
+                        <li>{t('jun')}</li>
+                        <li>{t('jul')}</li>
+                        <li>{t('aug')}</li>
+                        <li>{t('sep')}</li>
+                        <li>{t('oct')}</li>
+                        <li>{t('nov')}</li>
+                        <li>{t('dec')}</li>
                     </ul>
                     <ul className="days pl-[40px]">
-                        <li>Mon</li>
-                        <li>Tue</li>
-                        <li>Wed</li>
-                        <li>Thu</li>
-                        <li>Fri</li>
-                        <li>Sat</li>
-                        <li>Sun</li>
+                        <li>{t('mon')}</li>
+                        <li>{t('tue')}</li>
+                        <li>{t('wed')}</li>
+                        <li>{t('thu')}</li>
+                        <li>{t('fri')}</li>
+                        <li>{t('sat')}</li>
+                        <li>{t('sun')}</li>
                     </ul>
                     <ul className="points mt-2 mb-2 pl-[40px]">
                         {preYearDays.map(day => (

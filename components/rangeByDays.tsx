@@ -2,8 +2,10 @@ import React from 'react'
 import { DailyRecord } from '../datahandling/dailyRecords'
 import { Doughnut } from './doughnut'
 import { Headline } from './headline'
+import { useTranslation } from '../contexts/TranslationContext'
 
 export const RangeByDays = ({ dailyRecords }: { dailyRecords: DailyRecord[] }) => {
+    const { t } = useTranslation()
     const daysInRange = {
         d0t10: 0,
         d10t20: 0,
@@ -46,8 +48,8 @@ export const RangeByDays = ({ dailyRecords }: { dailyRecords: DailyRecord[] }) =
         <>
             <Headline
                 size={2}
-                text="Range By Days"
-                subheadline="Hover over this graph to see how many days you spent in which range for the entire year."
+                text={t('rangeByDays')}
+                subheadline={t('rangeByDaysSubheadline')}
             />
             <div className="percentage-bar flex w-[1500px] text-center">
                 {daysInRange.d0t10 > 0 && (
@@ -59,7 +61,7 @@ export const RangeByDays = ({ dailyRecords }: { dailyRecords: DailyRecord[] }) =
                     >
                         <span className="tooltiptext">
                             <>
-                                {daysInRange.d0t10} days between 0% and 10% in range
+                                {daysInRange.d0t10} {t('daysBetween')} 0% {t('and')} 10% {t('inRange')}
                             </>
                         </span>
                     </div>
@@ -73,7 +75,7 @@ export const RangeByDays = ({ dailyRecords }: { dailyRecords: DailyRecord[] }) =
                     >
                         <span className="tooltiptext">
                             <>
-                                {daysInRange.d10t20} days between 10% and 20% in range
+                                {daysInRange.d10t20} {t('daysBetween')} 10% {t('and')} 20% {t('inRange')}
                             </>
                         </span>
                     </div>
@@ -87,7 +89,7 @@ export const RangeByDays = ({ dailyRecords }: { dailyRecords: DailyRecord[] }) =
                         >
                         <span className="tooltiptext">
                             <>
-                                {daysInRange.d20t30} days between 20% and 30% in range
+                                {daysInRange.d20t30} {t('daysBetween')} 20% {t('and')} 30% {t('inRange')}
                             </>
                         </span>
                     </div>
@@ -101,7 +103,7 @@ export const RangeByDays = ({ dailyRecords }: { dailyRecords: DailyRecord[] }) =
                         >
                         <span className="tooltiptext">
                             <>
-                                {daysInRange.d30t40} days between 30% and 40% in range
+                                {daysInRange.d30t40} {t('daysBetween')} 30% {t('and')} 40% {t('inRange')}
                             </>
                         </span>
                     </div>
@@ -115,7 +117,7 @@ export const RangeByDays = ({ dailyRecords }: { dailyRecords: DailyRecord[] }) =
                         >
                         <span className="tooltiptext">
                             <>
-                                {daysInRange.d40t50} days between 40% and 50% in range
+                                {daysInRange.d40t50} {t('daysBetween')} 40% {t('and')} 50% {t('inRange')}
                             </>
                         </span>
                     </div>
@@ -129,7 +131,7 @@ export const RangeByDays = ({ dailyRecords }: { dailyRecords: DailyRecord[] }) =
                         >
                         <span className="tooltiptext">
                             <>
-                                {daysInRange.d50t60} days between 50% and 60% in range
+                                {daysInRange.d50t60} {t('daysBetween')} 50% {t('and')} 60% {t('inRange')}
                             </>
                         </span>
                     </div>
@@ -143,7 +145,7 @@ export const RangeByDays = ({ dailyRecords }: { dailyRecords: DailyRecord[] }) =
                         >
                         <span className="tooltiptext">
                             <>
-                                {daysInRange.d60t70} days between 60% and 70% in range
+                                {daysInRange.d60t70} {t('daysBetween')} 60% {t('and')} 70% {t('inRange')}
                             </>
                         </span>
                     </div>
@@ -157,7 +159,7 @@ export const RangeByDays = ({ dailyRecords }: { dailyRecords: DailyRecord[] }) =
                         >
                         <span className="tooltiptext">
                             <>
-                                {daysInRange.d70t80} days between 70% and 80% in range
+                                {daysInRange.d70t80} {t('daysBetween')} 70% {t('and')} 80% {t('inRange')}
                             </>
                         </span>
                     </div>
@@ -171,7 +173,7 @@ export const RangeByDays = ({ dailyRecords }: { dailyRecords: DailyRecord[] }) =
                         >
                         <span className="tooltiptext">
                             <>
-                                {daysInRange.d80t90} days between 80% and 90% in range
+                                {daysInRange.d80t90} {t('daysBetween')} 80% {t('and')} 90% {t('inRange')}
                             </>
                         </span>
                     </div>
@@ -185,7 +187,7 @@ export const RangeByDays = ({ dailyRecords }: { dailyRecords: DailyRecord[] }) =
                         >
                         <span className="tooltiptext">
                             <>
-                                {daysInRange.d90t100} days between 90% and 100% in range
+                                {daysInRange.d90t100} {t('daysBetween')} 90% {t('and')} 100% {t('inRange')}
                             </>
                         </span>
                     </div>
