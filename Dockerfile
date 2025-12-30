@@ -27,7 +27,9 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Expose port 80
 EXPOSE 80
 
-# Start nginx using shell form (not JSON array) to avoid argument parsing issues
-# This bypasses the problematic docker-entrypoint.sh
-CMD ["/bin/sh", "-c", "/usr/sbin/nginx -g 'daemon off;'"]
+# Reset the entrypoint to disable docker-entrypoint.sh from nginx:alpine
+ENTRYPOINT []
+
+# Start nginx directly using exec form with shell wrapper
+CMD ["/bin/sh", "-c", "nginx -g 'daemon off;'"]
 
