@@ -43,7 +43,7 @@ export const translations = {
     
     // Nightscout
     nightscoutRequirements: 'Nightscout Requirements',
-    nightscoutReq1: 'API Secret or access token with at least a',
+    nightscoutReq1: 'API Secret (from environment variables) or Access Token with at least a',
     readable: 'readable',
     role: 'role.',
     nightscoutReq2: 'CORS must be enabled. Set',
@@ -51,10 +51,10 @@ export const translations = {
     inVariable: 'in your Nightscout',
     variable: 'environment variables',
     configuration: '.',
-    nightscoutReq3: 'If you have CORS issues, try using a token instead of API secret. Create one in Nightscout Admin Tools.',
+    nightscoutReq3: 'If you have CORS issues, create an access token in Admin Tools → Subjects with "readable" role and use it instead of API secret.',
     nightscoutServer: 'Nightscout Server',
-    apiSecretOrToken: 'API Secret or Token',
-    apiSecret: 'API Secret or Token',
+    apiSecretOrToken: 'API Secret or Access Token',
+    apiSecret: 'API Secret or Access Token',
     startDate: 'Start Date',
     endDate: 'End Date',
     wrapIt: 'Wrap it!',

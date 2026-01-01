@@ -43,7 +43,7 @@ export const translations = {
     
     // Nightscout
     nightscoutRequirements: 'Požiadavky Nightscout',
-    nightscoutReq1: 'API Secret alebo prístupový token s aspoň',
+    nightscoutReq1: 'API Secret (z premenných prostredia) alebo Access Token s aspoň',
     readable: 'readable',
     role: 'rolou.',
     nightscoutReq2: 'CORS musí byť povolený. Nastavte',
@@ -51,10 +51,10 @@ export const translations = {
     inVariable: 'v premenných prostredia',
     variable: 'Nightscout',
     configuration: '.',
-    nightscoutReq3: 'Ak máte problémy s CORS, skúste použiť token namiesto API secret. Vytvorte ho v Nightscout Admin Tools.',
+    nightscoutReq3: 'Ak máte problémy s CORS, vytvorte si prístupový token v Admin Tools → Subjects s rolou "readable" a použite ho namiesto API secret.',
     nightscoutServer: 'Nightscout Server',
-    apiSecretOrToken: 'API Secret alebo Token',
-    apiSecret: 'API Secret alebo Token',
+    apiSecretOrToken: 'API Secret alebo Access Token',
+    apiSecret: 'API Secret alebo Access Token',
     startDate: 'Dátum začiatku',
     endDate: 'Dátum konca',
     wrapIt: 'Zabaliť!',
