@@ -43,7 +43,7 @@ export const translations = {
     
     // Nightscout
     nightscoutRequirements: 'Nightscout Requirements',
-    nightscoutReq1: 'API Secret (from environment variables) or Access Token with at least a',
+    nightscoutReq1: 'For protected Nightscout: API Secret or Access Token with at least a',
     readable: 'readable',
     role: 'role.',
     nightscoutReq2: 'CORS must be enabled. Set',
@@ -55,6 +55,8 @@ export const translations = {
     nightscoutServer: 'Nightscout Server',
     apiSecretOrToken: 'API Secret or Access Token',
     apiSecret: 'API Secret or Access Token',
+    optional: 'optional',
+    leaveEmptyIfPublic: 'Leave empty if public Nightscout',
     startDate: 'Start Date',
     endDate: 'End Date',
     wrapIt: 'Wrap it!',

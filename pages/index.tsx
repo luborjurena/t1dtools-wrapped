@@ -477,13 +477,13 @@ export default function Home() {
                                             <label
                                                 htmlFor="nskey"
                                                 className="text-sm font-bold tracking-wide text-gray-500">
-                                                {t('apiSecret')}
+                                                {t('apiSecret')} <span className="text-gray-600 font-normal">({t('optional')})</span>
                                             </label>
 
                                             <input
                                                 id="nskey"
                                                 type="text"
-                                                placeholder="t1dtools-0a6c761d3286c8d9"
+                                                placeholder={t('leaveEmptyIfPublic')}
                                                 className="block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
                                                 onChange={e => setNightscoutSecret(e.target.value as string)}
                                             />
@@ -520,7 +520,7 @@ export default function Home() {
                                             <button
                                                 className="mt-8 rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:text-gray-500 disabled:opacity-50"
                                                 onClick={() => getNightscoutData()}
-                                                disabled={nightscoutDomain === '' || nightscoutSecret === '' || !startDate || !endDate}>
+                                                disabled={nightscoutDomain === '' || !startDate || !endDate}>
                                                 {t('wrapIt')}
                                             </button>
                                         </div>

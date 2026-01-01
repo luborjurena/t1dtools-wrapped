@@ -43,7 +43,7 @@ export const translations = {
     
     // Nightscout
     nightscoutRequirements: 'Požiadavky Nightscout',
-    nightscoutReq1: 'API Secret (z premenných prostredia) alebo Access Token s aspoň',
+    nightscoutReq1: 'Pre chránený Nightscout: API Secret alebo Access Token s aspoň',
     readable: 'readable',
     role: 'rolou.',
     nightscoutReq2: 'CORS musí byť povolený. Nastavte',
@@ -55,6 +55,8 @@ export const translations = {
     nightscoutServer: 'Nightscout Server',
     apiSecretOrToken: 'API Secret alebo Access Token',
     apiSecret: 'API Secret alebo Access Token',
+    optional: 'voliteľné',
+    leaveEmptyIfPublic: 'Nechajte prázdne ak je Nightscout verejný',
     startDate: 'Dátum začiatku',
     endDate: 'Dátum konca',
     wrapIt: 'Zabaliť!',
