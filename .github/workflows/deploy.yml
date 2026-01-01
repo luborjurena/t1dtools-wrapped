@@ -72,5 +72,5 @@ jobs:
             docker rm diabetes-wrapped --force || true
             docker pull ${IMAGE}
             docker tag ${IMAGE} diabetes-wrapped
-            docker run -d --name diabetes-wrapped -p 127.0.0.1:3333:80 diabetes-wrapped
+            docker run -d --name diabetes-wrapped -p 3333:80 diabetes-wrapped
 
