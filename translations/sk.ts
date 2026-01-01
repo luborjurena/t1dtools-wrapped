@@ -6,7 +6,7 @@ export const translations = {
     // Main page
     headline: 'glykemia.sk',
     visualizeTitle: 'Vizualizujte svoje údaje z CGM!',
-    description: 'glykemia.sk wrapped nástroj beží celý vo vašom prehliadači, neodosiela žiadne údaje na servery. Nájdite projekt na',
+    description: 'Tento nástroj beží celý vo vašom prehliadači, neodosiela žiadne údaje na servery. Projekt je dostupný na',
     curious: 'Zaujíma vás, čo to je?',
     demoLink: 'Pozrite si túto ukážku',
     
