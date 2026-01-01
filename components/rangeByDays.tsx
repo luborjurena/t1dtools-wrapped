@@ -39,7 +39,7 @@ export const RangeByDays = ({ dailyRecords }: { dailyRecords: DailyRecord[] }) =
             daysInRange.d70t80++
         } else if (percentage >= 80 && percentage < 90) {
             daysInRange.d80t90++
-        } else if (percentage >= 90 && percentage < 100) {
+        } else if (percentage >= 90 && percentage <= 100) {
             daysInRange.d90t100++
         }
     })

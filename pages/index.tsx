@@ -27,6 +27,7 @@ export default function Home() {
     
     // Date range for Nightscout - default to current year
     const currentYear = new Date().getFullYear()
+    const [targetYear, setTargetYear] = useState<string>(String(currentYear))
     const [startDate, setStartDate] = useState<string>(() => {
         const date = new Date(currentYear, 0, 1)
         return date.toISOString().split('T')[0]
@@ -146,10 +147,18 @@ export default function Home() {
 
             const file = event.target.files[0]
 
+            const parsedYear = parseInt(targetYear, 10)
+            if (isNaN(parsedYear) || parsedYear < 2000 || parsedYear > 2100) {
+                clearInterval(loadingInterval)
+                setCGMDataError('Please enter a valid year between 2000 and 2100.')
+                setCGMDataLoading(false)
+                return
+            }
+
             if (cgmProvider === 'libreview') {
-                response = await parseLibreViewData(file, 2022)
+                response = await parseLibreViewData(file, parsedYear)
             } else if (cgmProvider === 'dexcom') {
-                response = await parseDexcomClarityData(file, 2022)
+                response = await parseDexcomClarityData(file, parsedYear)
             }
         } else if (cgmProvider === 'nightscout') {
             const start = new Date(startDate)
@@ -208,9 +217,11 @@ export default function Home() {
 
     const showDemo = () => {
         const demoData: DailyRecord[] = []
+        const parsedYear = parseInt(targetYear, 10)
+        const demoYear = isNaN(parsedYear) ? currentYear : parsedYear
         for (let i = 1; i < 366; i++) {
             demoData.push({
-                date: new Date(2022, 0, i),
+                date: new Date(demoYear, 0, i),
                 rangePercentage: Math.round(Math.random() * 100),
             })
         }
@@ -342,6 +353,17 @@ export default function Home() {
                                 )}
                                 {(cgmProvider === 'libreview' || cgmProvider === 'dexcom') && (
                                     <div className="grid grid-cols-1 space-y-2">
+                                        <label className="text-sm font-bold tracking-wide text-gray-500">
+                                            Year to analyze
+                                        </label>
+                                        <input
+                                            type="number"
+                                            min="2000"
+                                            max="2100"
+                                            value={targetYear}
+                                            onChange={e => setTargetYear(e.target.value)}
+                                            className="block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+                                        />
                                         <label className="text-sm font-bold tracking-wide text-gray-500">
                                             {t('selectCSVFile')}{' '}
                                             <span className="text-sm font-thin text-gray-400">
