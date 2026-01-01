@@ -11,6 +11,83 @@ async function sha1Hash(text: string): Promise<string> {
     return hashHex
 }
 
+// Try to fetch with different authentication methods
+async function fetchWithAuth(
+    url: string,
+    apiSecret: string,
+    hashedSecret: string
+): Promise<Response> {
+    // Method 1: Try with hashed API secret in header (most common)
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                'API-SECRET': hashedSecret,
+                'Accept': 'application/json',
+            },
+        })
+        if (response.ok || response.status !== 0) {
+            return response
+        }
+    } catch (e) {
+        // Continue to next method
+    }
+
+    // Method 2: Try with plain API secret in header
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                'API-SECRET': apiSecret,
+                'Accept': 'application/json',
+            },
+        })
+        if (response.ok || response.status !== 0) {
+            return response
+        }
+    } catch (e) {
+        // Continue to next method
+    }
+
+    // Method 3: Try with token in URL (avoids preflight for some servers)
+    // This uses the hashed secret as a token parameter
+    const urlWithToken = url.includes('?') 
+        ? `${url}&token=${encodeURIComponent(apiSecret)}`
+        : `${url}?token=${encodeURIComponent(apiSecret)}`
+    
+    try {
+        const response = await fetch(urlWithToken, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                'Accept': 'application/json',
+            },
+        })
+        if (response.ok || response.status !== 0) {
+            return response
+        }
+    } catch (e) {
+        // Continue to next method
+    }
+
+    // Method 4: Try without custom headers (for public Nightscout instances)
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                'Accept': 'application/json',
+            },
+        })
+        return response
+    } catch (e) {
+        // If all methods fail, throw the error
+        throw e
+    }
+}
+
 export type NightscoutReading = {
     _id: string
     type: string
@@ -67,31 +144,18 @@ export const fetchAndParseNightscoutData = async (
 
         const url = `${normalizedURL}/api/v1/entries.json?count=1440&find[date][$lte]=${beforeDate}`
         try {
-            // Try with hashed API secret first (most common Nightscout configuration)
+            // Try multiple authentication methods to work around CORS issues
             const hashedSecret = await sha1Hash(apiSecret)
-            let response = await fetch(url, {
-                headers: {
-                    'API-SECRET': hashedSecret,
-                },
-            })
-
-            // If 401, try with plain secret (some Nightscout instances accept plain secrets)
-            if (response.status === 401) {
-                response = await fetch(url, {
-                    headers: {
-                        'API-SECRET': apiSecret,
-                    },
-                })
-            }
+            const response = await fetchWithAuth(url, apiSecret, hashedSecret)
 
             if (!response.ok) {
                 let errorMessage = `Unable to fetch data from Nightscout API. Server returned ${response.status} ${response.statusText}.`
                 if (response.status === 401) {
-                    errorMessage = 'Authentication failed. Please verify your API secret is correct. The API secret should be at least 12 characters and match the one configured in your Nightscout instance.'
+                    errorMessage = 'Authentication failed. Please verify your API secret is correct. The API secret should be at least 12 characters and match the one configured in your Nightscout instance. If using a token, ensure it has "readable" permissions.'
                 } else if (response.status === 403) {
-                    errorMessage += ' Access forbidden. Check that your API secret has the correct permissions (readable role).'
+                    errorMessage += ' Access forbidden. Check that your API secret or token has the correct permissions (readable role).'
                 } else if (response.status === 0) {
-                    errorMessage += ' This may be a CORS issue. Ensure your Nightscout server has CORS enabled and allows requests from this origin.'
+                    errorMessage = 'CORS error: Your browser blocked the request. Please configure your Nightscout server to allow requests from this origin. Add your domain to the ENABLE_CORS or CORS environment variable in your Nightscout configuration.'
                 }
                 return {
                     records: [],
@@ -107,11 +171,7 @@ export const fetchAndParseNightscoutData = async (
                     // Try to get the most recent data to see what year we have
                     const testUrl = `${normalizedURL}/api/v1/entries.json?count=1`
                     try {
-                        const testResponse = await fetch(testUrl, {
-                            headers: {
-                                'API-SECRET': hashedSecret,
-                            },
-                        })
+                        const testResponse = await fetchWithAuth(testUrl, apiSecret, hashedSecret)
                         if (testResponse.ok) {
                             const testData = await testResponse.json()
                             if (testData && testData.length > 0) {
@@ -163,9 +223,26 @@ export const fetchAndParseNightscoutData = async (
             allReadings.push(...filteredReadings)
             breakOut++
         } catch (e: any) {
+            // Check for CORS-related errors
+            const isCorsError = 
+                e.name === 'TypeError' || 
+                e.message?.includes('fetch') ||
+                e.message?.includes('CORS') ||
+                e.message?.includes('NetworkError') ||
+                e.message?.includes('Failed to fetch') ||
+                e.message?.includes('Network request failed')
+            
             let errorMessage = 'Unable to fetch data from Nightscout API.'
-            if (e.name === 'TypeError' && e.message.includes('fetch')) {
-                errorMessage += ' This is likely a CORS (Cross-Origin Resource Sharing) issue. Your Nightscout server needs to be configured to allow requests from this origin. Add your origin (e.g., http://localhost:3000) to the CORS configuration in your Nightscout VARIABLES.'
+            
+            if (isCorsError) {
+                errorMessage = `CORS Error: Your browser blocked the request to Nightscout. 
+
+To fix this, configure your Nightscout server:
+1. Add ENABLE_CORS=true to your Nightscout environment variables
+2. Or add your domain to the CORS variable (e.g., CORS=https://yourdomain.com)
+3. Restart your Nightscout server after making changes
+
+Alternatively, you can use a Nightscout access token instead of the API secret. Create a token with "readable" role in your Nightscout admin panel and use that instead.`
             } else {
                 errorMessage += ` Error: ${e.message || 'Unknown error'}`
             }

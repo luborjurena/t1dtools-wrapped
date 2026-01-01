@@ -453,6 +453,9 @@ export default function Home() {
                                                     </a>{' '}
                                                     {t('configuration')}
                                                 </li>
+                                                <li className="text-yellow-400">
+                                                    {t('nightscoutReq3')}
+                                                </li>
                                             </ul>
                                         </div>
                                         <div className="grid grid-cols-1 space-y-2">
